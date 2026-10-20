@@ -35,8 +35,9 @@
       }
     ],
     "mapping_derivation": "Read columns scenario, load_scenario_idx from bus partitions 0..4; concatenate; drop duplicate rows; CSV contains all 1000 scenario/group pairs. Scenario IDs are contiguous 0..999; source dataset processor enforces the same index identity.",
-    "scope": "Metadata-only reproduction of the current tutorial selection. No model inference or performance remeasurement."
+    "scope": "Native CPU evaluation of the pinned GENCO Small checkpoint on the tutorial re-split and saved original holdout within the first 1,000 IEEE 118 scenarios, with evaluated scenario IDs checked against each selection."
   },
+  "annotation_correction": "Corrected the inherited metadata-only provenance.scope label after native CPU run 39454719421 at source commit f86d34c4b2c1498b1bba53659aa0a60731519bca. All recorded IDs, metrics, timings and runtime values are unchanged.",
   "torch": "2.11.0+cpu",
   "device": "cpu",
   "batch_size": 8,

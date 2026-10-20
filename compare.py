@@ -75,8 +75,12 @@ def main():
         local_dir=str(work / "weights"))
 
     config_path = upstream / "examples" / "config" / "HGNS_OPF_case118_small.yaml"
-    receipt = {"provenance": provenance, "torch": torch.__version__,
+    receipt = {"provenance": {**provenance}, "torch": torch.__version__,
                "device": "cpu", "batch_size": 8, "runs": {}}
+    receipt["provenance"]["scope"] = (
+        "Native CPU evaluation of the pinned GENCO Small checkpoint on the "
+        "tutorial re-split and saved original holdout within the first 1,000 "
+        "IEEE 118 scenarios, with evaluated scenario IDs checked against each selection.")
     for name in ("tutorial", "saved-holdout"):
         config = yaml.safe_load(config_path.read_text())
         config["training"]["accelerator"] = "cpu"
