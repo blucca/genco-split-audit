@@ -5,9 +5,9 @@ then loads the paper's pretrained Small checkpoint. Re-splitting that small
 slice gives **71 test scenarios: 48 from the checkpoint's original training
 split and 23 from its original test split**.
 
-This is a metadata-only reproduction using the original scenario and
-load-group IDs. It evaluates the tutorial's sampling contract; model error,
-runtime, and the paper's original full-test results have not been remeasured.
+The audit uses original scenario and load-group IDs. The companion CPU
+workflow now runs the official GENCO evaluator with both selections, using
+the same pretrained Small weights and saved normalizer.
 
 ## Reproduce
 
@@ -40,6 +40,48 @@ the official test set. Full reproduction uses the complete saved test split.
 
 The 2000-to-118 transfer experiment has a different pretraining population;
 its provenance should be described separately.
+
+## Run the saved-holdout evaluation
+
+[Interactive result](https://blucca.github.io/genco-split-audit/) ·
+[Actual CPU run](https://github.com/blucca/genco-split-audit/actions/runs/39454719421) ·
+[Native results](docs/comparison.json) · [Saved local membership](docs/membership.json)
+
+Fork this repository and run **Pinned CPU holdout comparison** from Actions.
+It downloads only the first five data partitions, preserves the checkpoint's
+original train/validation/test membership, and runs the upstream evaluator.
+The `holdout-comparison` artifact contains ready-to-use `train.pt`, `val.pt`,
+`test.pt`, the two configurations, native split receipts, logs, and CSVs.
+
+For an existing CPU environment, follow the pinned installation in
+[the workflow](.github/workflows/compare.yml), then run:
+
+```sh
+python compare.py --graphkit /path/to/pinned/gridfm-graphkit --work /path/to/temp/comparison
+```
+
+The script checks all actual evaluated IDs against the intended selections.
+It uses upstream `split_from_existing_files`; the downloaded raw IDs in this
+specific corpus are contiguous dataset indices 0–999. Tiny-model training
+keeps its own local split. Other corpora need their own ID mapping.
+
+### Observed CPU results
+
+| Selection | Cases | Previously in training | Generator Pg RMSE (MW) | Mean objective gap |
+|---|---:|---:|---:|---:|
+| Tutorial re-split | 71 | 48 | 12.480 | 1.294% |
+| Saved original holdout, local slice | 93 | 0 | 16.109 | 1.267% |
+
+These are two different sample sets. Pg error rises while objective gap falls.
+The comparison describes those selections; it does not isolate a causal
+memorization effect or repeat the paper's full-test evaluation.
+
+Both native invocations completed on CPU, with Torch 2.11.0+cpu and batch size
+8. Their wall times were 22.6 and 15.1 seconds, including evaluator startup,
+I/O and reporting; the second reuses processed data. Use them as execution
+receipts, not a paired speed benchmark. The initial installation attempt
+failed because the TorchAudio 2.12 CPU wheel was unavailable; the workflow
+now pins the matched 2.11 CPU set.
 
 ## Sources and exact scope
 
