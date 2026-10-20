@@ -1,0 +1,38 @@
+{
+  "graphkit_revision": "9d42d8233268dc92c07f334a643b20b134880f4e",
+  "dataset": "gridfm/opf_small_case118_ieee",
+  "dataset_revision": "5377c37bd0e75980590788ffdcb9100d3bc330ff",
+  "model": "gridfm/genco-opf-datakit",
+  "model_revision": "2d2401572f6a2d0c1be79841b2def99cf45e1639",
+  "checkpoint": "case118_ieee/small/seed0/best_model_state_dict.pt",
+  "run": "465594abc8eb4c96b908363afc84a0e1",
+  "raw_bus_files": [
+    {
+      "partition": 0,
+      "path": "bus_data.parquet/scenario_partition=0/6719bffc8bfa4bbc9e1716236d787015-0.parquet",
+      "size": 942830
+    },
+    {
+      "partition": 1,
+      "path": "bus_data.parquet/scenario_partition=1/6719bffc8bfa4bbc9e1716236d787015-0.parquet",
+      "size": 946686
+    },
+    {
+      "partition": 2,
+      "path": "bus_data.parquet/scenario_partition=2/6719bffc8bfa4bbc9e1716236d787015-0.parquet",
+      "size": 948880
+    },
+    {
+      "partition": 3,
+      "path": "bus_data.parquet/scenario_partition=3/6719bffc8bfa4bbc9e1716236d787015-0.parquet",
+      "size": 945416
+    },
+    {
+      "partition": 4,
+      "path": "bus_data.parquet/scenario_partition=4/6719bffc8bfa4bbc9e1716236d787015-0.parquet",
+      "size": 946258
+    }
+  ],
+  "mapping_derivation": "Read columns scenario, load_scenario_idx from bus partitions 0..4; concatenate; drop duplicate rows; CSV contains all 1000 scenario/group pairs. Scenario IDs are contiguous 0..999; source dataset processor enforces the same index identity.",
+  "scope": "Metadata-only reproduction of the current tutorial selection. No model inference or performance remeasurement."
+}
