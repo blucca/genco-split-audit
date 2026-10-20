@@ -1,0 +1,55 @@
+name: Pinned CPU holdout comparison
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OMP_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+      OPENBLAS_NUM_THREADS: "2"
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DISABLE_XET: "1"
+      HF_HOME: ${{ github.workspace }}/temp/hf
+      PIP_CACHE_DIR: ${{ github.workspace }}/temp/pip
+      MPLCONFIGDIR: ${{ github.workspace }}/temp/matplotlib
+      MLFLOW_ALLOW_FILE_STORE: "true"
+      MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING: "false"
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: gridfm/gridfm-graphkit
+          ref: 9d42d8233268dc92c07f334a643b20b134880f4e
+          path: temp/graphkit
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install CPU runtime
+        run: |
+          python -m pip install torch==2.12.0 torchvision==0.27.0 torchaudio==2.12.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install torch-scatter --only-binary=:all: -f https://data.pyg.org/whl/torch-2.12.0+cpu.html
+          python -m pip install ./temp/graphkit huggingface_hub pyarrow
+      - name: Reproduce and repair the heldout selection
+        run: python compare.py --graphkit temp/graphkit --work temp/run
+      - name: Save native receipts, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: holdout-comparison
+          retention-days: 7
+          path: |
+            temp/run/audit.json
+            temp/run/comparison.json
+            temp/run/saved-subset/
+            temp/run/*/config.yaml
+            temp/run/*/evaluation.log
+            temp/run/*/*.csv
+            temp/run/*/mlruns/**/artifacts/stats/
