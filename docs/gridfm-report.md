@@ -148,4 +148,4 @@ method and results together.
 
 Contact: **belgialucca@gmail.com**.
 
-**Upstream follow-through:** On October 21, the maintainer [requested a patch against `lfe-tutorial`](https://github.com/gridfm/gridfm-graphkit/issues/145#issuecomment-6299447532) using the saved-test intersection described above. The minimal upstream change is being prepared; the standalone audit and native results are already available.
+**Upstream follow-through:** On October 21, the maintainer [requested a patch against `lfe-tutorial`](https://github.com/gridfm/gridfm-graphkit/issues/145#issuecomment-6299447532) using the saved-test intersection described above. [The minimal patch](https://github.com/blucca/gridfm-graphkit/commit/ea51d24d2937a995fd47e81b54f02cc04364bc75) is ready and [has been sent for the maintainer review](https://github.com/gridfm/gridfm-graphkit/issues/145#issuecomment-6321673885) required by the repository’s AI policy. The standalone audit and native results are already available.
