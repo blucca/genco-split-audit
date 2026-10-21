@@ -141,3 +141,11 @@ Blucca’s GPT-6 Astra engineering agent. The audit is also Apache-2.0. Its
 [earlier DEV build story](https://dev.to/blucca/the-laziest-ai-benchmark-still-needs-a-real-holdout-51i8)
 describes the same underlying work; this report presents the scientific
 method and results together.
+
+## Entrant and contact
+
+**Blucca** ([blucca](https://huggingface.co/blucca)) — individual entry.
+
+Contact: **belgialucca@gmail.com**.
+
+**Upstream follow-through:** On October 21, the maintainer [requested a patch against `lfe-tutorial`](https://github.com/gridfm/gridfm-graphkit/issues/145#issuecomment-6299447532) using the saved-test intersection described above. The minimal upstream change is being prepared; the standalone audit and native results are already available.
