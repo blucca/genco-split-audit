@@ -2,6 +2,14 @@ name: Pinned CPU holdout comparison
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Original comparison or disjoint subgroup diagnostic
+        type: choice
+        default: comparison
+        options:
+          - comparison
+          - subgroups
 
 permissions:
   contents: read
@@ -38,18 +46,19 @@ jobs:
           python -m pip install torch-scatter --only-binary=:all: -f https://data.pyg.org/whl/torch-2.11.0+cpu.html
           python -m pip install ./temp/graphkit huggingface_hub pyarrow
       - name: Reproduce and repair the heldout selection
-        run: python compare.py --graphkit temp/graphkit --work temp/run
+        run: python compare.py --graphkit temp/graphkit --work temp/run ${{ inputs.mode == 'subgroups' && '--subgroups' || '' }}
       - name: Save native receipts, including failures
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: holdout-comparison
+          name: holdout-${{ inputs.mode }}
           retention-days: 7
           path: |
             temp/run/audit.json
             temp/run/comparison.json
             temp/run/saved-subset/
             temp/run/*/config.yaml
+            temp/run/*/selection/
             temp/run/*/evaluation.log
             temp/run/*/*.csv
             temp/run/*/mlruns/**/artifacts/stats/

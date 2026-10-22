@@ -20,6 +20,8 @@ def main():
                         help="Checkout at the revision in provenance.json")
     parser.add_argument("--work", type=Path, required=True,
                         help="Scratch/output directory; use a temp directory")
+    parser.add_argument("--subgroups", action="store_true",
+                        help="Evaluate disjoint seen-48, unseen-23 and unseen-70 groups")
     args = parser.parse_args()
     work, upstream = args.work.resolve(), args.graphkit.resolve()
     work.mkdir(parents=True, exist_ok=True)
@@ -50,6 +52,19 @@ def main():
             for name in ("train", "val", "test")}
     assert safe["test"] == observed["local_official_test_ids"]
     assert not set(safe["test"]) & (set(paper["train"]) | set(paper["val"]))
+    selections = {
+        "tutorial": observed["tutorial_test_ids"],
+        "saved-holdout": safe["test"],
+    }
+    if args.subgroups:
+        selections = {
+            "seen-48": observed["overlap_ids"]["train"],
+            "unseen-23": observed["overlap_ids"]["test"],
+            "unseen-70": sorted(set(safe["test"]) - set(observed["tutorial_test_ids"])),
+        }
+        assert [len(ids) for ids in selections.values()] == [48, 23, 70]
+        assert len(set.union(*(set(ids) for ids in selections.values()))) == 141
+        assert set(selections["unseen-23"] + selections["unseen-70"]) == set(safe["test"])
     split_dir = work / "saved-subset"
     split_dir.mkdir(exist_ok=True)
     for name, ids in safe.items():
@@ -81,16 +96,31 @@ def main():
         "Native CPU evaluation of the pinned GENCO Small checkpoint on the "
         "tutorial re-split and saved original holdout within the first 1,000 "
         "IEEE 118 scenarios, with evaluated scenario IDs checked against each selection.")
-    for name in ("tutorial", "saved-holdout"):
+    if args.subgroups:
+        receipt["provenance"]["scope"] = (
+            "Native CPU evaluation of three disjoint membership/load-group subsets "
+            "of the first 1,000 IEEE 118 scenarios. Checkpoint and saved normalizer "
+            "are unchanged; no retraining. Runtime train IDs exclude the selected "
+            "evaluation IDs, while original training membership remains in audit.json.")
+    for name, expected in selections.items():
         config = yaml.safe_load(config_path.read_text())
         config["training"]["accelerator"] = "cpu"
         config["training"]["devices"] = 1
         config["data"]["workers"] = 0
-        expected = observed["tutorial_test_ids"]
-        if name == "saved-holdout":
+        if name != "tutorial":
+            selected_split = split_dir
+            if args.subgroups:
+                selected_split = work / name / "selection"
+                selected_split.mkdir(parents=True, exist_ok=True)
+                sampler = {**safe, "test": expected,
+                           "train": sorted(set(safe["train"]) - set(expected))}
+                assert not set(sampler["train"]) & set(expected)
+                for split, ids in sampler.items():
+                    torch.save(torch.tensor(ids, dtype=torch.long), selected_split / f"{split}.pt")
+                (selected_split / "scenario_splits.json").write_text(
+                    json.dumps(sampler, indent=2) + "\n")
             config["data"]["split_by_load_scenario_idx"] = False
-            config["data"]["split_from_existing_files"] = str(split_dir)
-            expected = safe["test"]
+            config["data"]["split_from_existing_files"] = str(selected_split)
         run_dir = work / name
         run_dir.mkdir(exist_ok=True)
         yaml_path = run_dir / "config.yaml"
