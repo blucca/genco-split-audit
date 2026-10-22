@@ -85,6 +85,18 @@ receipts, not a paired speed benchmark. The initial installation attempt
 failed because the TorchAudio 2.12 CPU wheel was unavailable; the workflow
 now pins the matched 2.11 CPU set.
 
+## Reader-requested disjoint subgroup check
+
+A [follow-up diagnostic](docs/subgroups.md) evaluates 48 seen cases, 23 unseen
+cases from load group 0, and the other 70 unseen cases separately. Native Pg
+RMSE is **8.647 / 18.121 / 15.410 MW**, respectively. The two unseen groups
+already differ by **2.712 MW**. The report includes the evaluator’s
+batch-weighting definition and a measured recombination discrepancy.
+
+Choose **subgroups** in the existing Actions workflow, or add `--subgroups`
+to the command above. [Native results and exact IDs](docs/subgroups.json)
+are permanently available; the original two-set results remain unchanged.
+
 ## Sources and exact scope
 
 - [Tutorial and helpers at `9d42d823`](https://github.com/gridfm/gridfm-graphkit/tree/9d42d8233268dc92c07f334a643b20b134880f4e/examples/notebooks):
