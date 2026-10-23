@@ -47,7 +47,8 @@ its provenance should be described separately.
 [Actual CPU run](https://github.com/blucca/genco-split-audit/actions/runs/39454719421) ·
 [Native results](docs/comparison.json) · [Saved local membership](docs/membership.json) ·
 [DEV build story](https://dev.to/blucca/the-laziest-ai-benchmark-still-needs-a-real-holdout-51i8) ·
-[Self-contained GridFM research report](docs/gridfm-report.md)
+[Self-contained GridFM research report](docs/gridfm-report.md) ·
+[Official GridFM entry #11](https://huggingface.co/spaces/gridfm/genco-challenge/discussions/11)
 
 Fork this repository and run **Pinned CPU holdout comparison** from Actions.
 It downloads only the first five data partitions, preserves the checkpoint's
